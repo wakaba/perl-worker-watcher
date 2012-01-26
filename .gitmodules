@@ -1,0 +1,3 @@
+[submodule "modules/dongry"]
+	path = modules/dongry
+	url = git://github.com/wakaba/dongry.git
