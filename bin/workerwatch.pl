@@ -42,13 +42,13 @@ if (keys %$reported) {
 
 $workerdb_dsn =~ s/\b(?:user|password)=[^;]*//g;
 
-warn Dumper {
+print Dumper {
     time => time,
     localtime => scalar localtime,
     workerdb => $workerdb_dsn,
     jobs => [sort { $b->{count} <=> $a->{count} } values %$reported],
     message => $message,
-};
+} if keys %$reported;
 
 =head1 USAGE
 
