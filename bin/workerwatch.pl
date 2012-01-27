@@ -10,8 +10,13 @@ use Getopt::Long;
 my $workerdb_dsn;
 my $message;
 my $CountThreshold = 100;
+my $ThresholdByFuncname = {};
 GetOptions(
     'count-threshold=s' => \$CountThreshold,
+    'count-threshold-by-funcname=s' => sub {
+        my ($funcname, $n) = split /=/, $_[1], 2;
+        $ThresholdByFuncname->{$funcname} = $n || 0;
+    },
     'dsn=s' => \$workerdb_dsn,
     'error-message=s' => \$message,
 ) or die "Usage: $0 --dsn=dsn --error-message=message\n";
@@ -38,6 +43,14 @@ if (keys %$reported) {
     )->each(sub {
         $reported->{$_->{funcid}}->{funcname} = $_->{funcname};
     });
+}
+
+my @report = values %$reported;
+for (@report) {
+    my $n = $ThresholdByFuncname->{$_->{funcname}};
+    if ($n and $_->{count} < $n) {
+        delete $reported->{$_->{funcid}};
+    }
 }
 
 $workerdb_dsn =~ s/\b(?:user|password)=[^;]*//g;
